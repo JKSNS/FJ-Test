@@ -57,7 +57,6 @@ function service_menu {
         "Python Flask/Django Web App"
         "Ruby on Rails Web App"
         "Ecommerce Platform (Magento/OpenCart)"
-        "HR Portal"
         "Exit"
     )
 
@@ -156,11 +155,6 @@ function service_menu {
                 ;;
             "Ecommerce Platform (Magento/OpenCart)")
                 echo "Running Ecommerce Platform in Firejail..."
-                sudo firejail /usr/sbin/apache2 -D FOREGROUND &
-                sudo firejail /usr/sbin/mysqld_safe &
-                ;;
-            "HR Portal")
-                echo "Running HR Portal in Firejail..."
                 sudo firejail /usr/sbin/apache2 -D FOREGROUND &
                 sudo firejail /usr/sbin/mysqld_safe &
                 ;;
