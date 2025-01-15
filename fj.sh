@@ -41,14 +41,14 @@ function install_firejail {
 # Add whitelist to Firejail profile
 function add_whitelist {
     FIREJAIL_PROFILE="/etc/firejail/server.profile"
-    WHITELIST_ENTRY="whitelist /etc/ssh/sshd_config"
+    WHITELIST_ENTRY="whitelist /etc/ssh"
 
     if [ -f "$FIREJAIL_PROFILE" ]; then
         if ! grep -q "$WHITELIST_ENTRY" "$FIREJAIL_PROFILE"; then
-            echo "Adding whitelist entry to Firejail profile..."
+            echo "Adding whitelist entry for /etc/ssh to Firejail profile..."
             echo "$WHITELIST_ENTRY" | sudo tee -a "$FIREJAIL_PROFILE"
         else
-            echo "Whitelist entry already exists in Firejail profile."
+            echo "Whitelist entry for /etc/ssh already exists in Firejail profile."
         fi
     else
         echo "Firejail profile not found at $FIREJAIL_PROFILE. Skipping whitelist addition."
@@ -81,7 +81,7 @@ function service_menu {
         case $opt in
             "22/SSH")
                 echo "Running SSH in Firejail with default profile..."
-                echo "Ensure the Firejail profile (/etc/firejail/server.profile) grants access to /etc/ssh/sshd_config and any other necessary files."
+                echo "Ensure the Firejail profile (/etc/firejail/server.profile) grants access to /etc/ssh and any other necessary files."
                 sudo firejail /usr/sbin/sshd -D
                 ;;
             "53/DNS")
