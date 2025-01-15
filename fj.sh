@@ -23,19 +23,38 @@ function detect_distro {
 # Install Firejail
 function install_firejail {
     if [ "$PM" == "apt-get" ]; then
+        echo "Adding Firejail PPA for Ubuntu..."
+        sudo add-apt-repository -y ppa:deki/firejail
         sudo apt-get update
-        sudo apt-get install -y firejail
+        echo "Installing Firejail and recommended profiles..."
+        sudo apt-get install -y firejail firejail-profiles build-essential git libapparmor-dev pkg-config gawk
     elif [ "$PM" == "dnf" ]; then
-        sudo dnf install -y firejail
+        echo "Installing Firejail and dependencies on Fedora..."
+        sudo dnf install -y firejail git gcc make libselinux-devel
     elif [ "$PM" == "zypper" ]; then
-        sudo zypper install -y firejail
+        echo "Installing Firejail on OpenSUSE..."
+        sudo zypper install -y firejail git gcc make
     elif [ "$PM" == "yum" ]; then
+        echo "Enabling EPEL repository and installing Firejail on RHEL/CentOS..."
         sudo yum install -y epel-release
-        sudo yum install -y firejail
+        sudo yum install -y firejail git gcc make libselinux-devel
     else
         echo "Failed to install Firejail. Unsupported package manager."
         exit 1
     fi
+}
+
+# Build and install Firejail from source
+function build_firejail {
+    echo "Building Firejail from source..."
+    git clone https://github.com/netblue30/firejail.git
+    cd firejail
+    ./configure --enable-apparmor --enable-selinux
+    make
+    sudo make install-strip
+    cd ..
+    rm -rf firejail
+    echo "Firejail successfully built and installed from source."
 }
 
 # Add whitelist to Firejail profiles
@@ -207,6 +226,8 @@ function main {
     echo "Installing Firejail..."
     install_firejail
     echo "Firejail installation complete."
+    echo "Building Firejail from source for latest features..."
+    build_firejail
     echo "Configuring Firejail profiles..."
     add_whitelist
     echo "Configuration complete."
