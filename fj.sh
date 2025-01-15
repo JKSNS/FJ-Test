@@ -43,12 +43,24 @@ function add_whitelist {
     FIREJAIL_PROFILE="/etc/firejail/server.profile"
     WHITELIST_ENTRY="whitelist /etc/ssh"
 
+    # Check if the Firejail profile exists
     if [ -f "$FIREJAIL_PROFILE" ]; then
+        # Ensure the script has permission to modify the profile
+        sudo chmod u+w "$FIREJAIL_PROFILE"
+        
+        # Add the whitelist entry if it doesn't already exist
         if ! grep -q "$WHITELIST_ENTRY" "$FIREJAIL_PROFILE"; then
             echo "Adding whitelist entry for /etc/ssh to Firejail profile..."
             echo "$WHITELIST_ENTRY" | sudo tee -a "$FIREJAIL_PROFILE"
         else
             echo "Whitelist entry for /etc/ssh already exists in Firejail profile."
+        fi
+
+        # Reconfirm the whitelist entry exists
+        if grep -q "$WHITELIST_ENTRY" "$FIREJAIL_PROFILE"; then
+            echo "Whitelist entry successfully added to Firejail profile."
+        else
+            echo "Failed to add whitelist entry to Firejail profile. Please check manually."
         fi
     else
         echo "Firejail profile not found at $FIREJAIL_PROFILE. Skipping whitelist addition."
