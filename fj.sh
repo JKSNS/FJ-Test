@@ -121,7 +121,7 @@ function service_menu {
             "22/SSH")
                 echo "Running SSH in Firejail with default profile..."
                 echo "Ensure the Firejail profiles grant access to /etc/ssh and any other necessary files."
-                sudo firejail /usr/sbin/sshd -D
+                sudo firejail --runas=root /usr/sbin/sshd -D
                 ;;
             "53/DNS")
                 echo "Running DNS in Firejail..."
@@ -226,6 +226,7 @@ function service_menu {
     done
 }
 
+# Main function
 function main {
     detect_distro
     echo "Installing Firejail..."
