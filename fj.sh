@@ -22,6 +22,11 @@ function detect_distro {
 
 # Install Firejail
 function install_firejail {
+    if command -v firejail &> /dev/null; then
+        echo "Firejail is already installed. Skipping installation."
+        return
+    fi
+
     if [ "$PM" == "apt-get" ]; then
         echo "Adding Firejail PPA for Ubuntu..."
         sudo add-apt-repository -y ppa:deki/firejail
@@ -46,6 +51,11 @@ function install_firejail {
 
 # Build and install Firejail from source
 function build_firejail {
+    if command -v firejail &> /dev/null; then
+        echo "Firejail is already built and installed from source. Skipping build."
+        return
+    fi
+
     echo "Building Firejail from source..."
     git clone https://github.com/netblue30/firejail.git
     cd firejail
@@ -60,32 +70,28 @@ function build_firejail {
 # Add whitelist to Firejail profiles
 function add_whitelist {
     FIREJAIL_PROFILES=("/etc/firejail/server.profile" "/etc/firejail/sshd.profile")
-    WHITELIST_ENTRY="whitelist /etc/ssh"
+    WHITELIST_ENTRIES=("whitelist /etc/ssh" "whitelist /etc/ssh/sshd_config")
 
     for PROFILE in "${FIREJAIL_PROFILES[@]}"; do
-        # Check if the Firejail profile exists
         if [ -f "$PROFILE" ]; then
-            # Ensure the script has permission to modify the profile
             sudo chmod u+w "$PROFILE"
-            
-            # Add the whitelist entry if it doesn't already exist
-            if ! grep -q "$WHITELIST_ENTRY" "$PROFILE"; then
-                echo "Adding whitelist entry for /etc/ssh to Firejail profile $PROFILE..."
-                echo "$WHITELIST_ENTRY" | sudo tee -a "$PROFILE"
-            else
-                echo "Whitelist entry for /etc/ssh already exists in Firejail profile $PROFILE."
-            fi
 
-            # Reconfirm the whitelist entry exists
-            if grep -q "$WHITELIST_ENTRY" "$PROFILE"; then
-                echo "Whitelist entry successfully added to Firejail profile $PROFILE."
-            else
-                echo "Failed to add whitelist entry to Firejail profile $PROFILE. Please check manually."
-            fi
+            for ENTRY in "${WHITELIST_ENTRIES[@]}"; do
+                if ! grep -q "$ENTRY" "$PROFILE"; then
+                    echo "Adding $ENTRY to $PROFILE..."
+                    echo "$ENTRY" | sudo tee -a "$PROFILE"
+                else
+                    echo "$ENTRY already exists in $PROFILE."
+                fi
+            done
         else
-            echo "Firejail profile not found at $PROFILE. Skipping whitelist addition."
+            echo "Firejail profile not found at $PROFILE. Skipping."
         fi
     done
+
+    # Ensure /etc/ssh/sshd_config has appropriate permissions
+    echo "Setting correct permissions for /etc/ssh/sshd_config..."
+    sudo chmod 644 /etc/ssh/sshd_config
 }
 
 # Comprehensive Service Menu
