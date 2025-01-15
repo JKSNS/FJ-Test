@@ -226,7 +226,6 @@ function service_menu {
     done
 }
 
-# Main function
 function main {
     detect_distro
     echo "Installing Firejail..."
