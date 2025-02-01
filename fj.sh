@@ -62,6 +62,19 @@ function build_firejail {
     echo "Firejail successfully built and installed from source."
 }
 
+# Clone and copy profiles from GitHub repository
+function fetch_firejail_profiles {
+    echo "Cloning Firejail profiles repository..."
+    git clone https://github.com/chiraag-nataraj/firejail-profiles.git /tmp/firejail-profiles
+    echo "Copying profiles to /etc/firejail..."
+    sudo cp /tmp/firejail-profiles/*.profile /etc/firejail/
+    sudo cp /tmp/firejail-profiles/common.inc /etc/firejail/
+    sudo chmod 644 /etc/firejail/*.profile
+    sudo chmod 644 /etc/firejail/common.inc
+    rm -rf /tmp/firejail-profiles
+    echo "Firejail profiles have been successfully added."
+}
+
 # Add whitelist entries to Firejail profiles
 function add_whitelist {
     FIREJAIL_PROFILES=("/etc/firejail/server.profile" "/etc/firejail/ssh.profile")
@@ -223,6 +236,8 @@ function main {
     echo "Firejail installation complete."
     echo "Building Firejail from source for latest features..."
     build_firejail
+    echo "Fetching additional Firejail profiles..."
+    fetch_firejail_profiles
     echo "Configuring Firejail profiles..."
     add_whitelist
     echo "Configuration complete."
