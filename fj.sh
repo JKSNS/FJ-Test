@@ -116,7 +116,7 @@ function service_menu {
         case $opt in
             "22/SSH")
                 echo "Running SSH in Firejail with default profile..."
-                sudo firejail --debug --profile=/etc/firejail/ssh.profile /usr/sbin/sshd -D
+                sudo firejail --profile=/etc/firejail/ssh.profile /usr/sbin/sshd -D
                 ;;
             "53/DNS")
                 echo "Running DNS in Firejail..."
