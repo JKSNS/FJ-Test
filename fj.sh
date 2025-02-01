@@ -71,6 +71,10 @@ function fetch_firejail_profiles {
     sudo cp /tmp/firejail-profiles/common.inc /etc/firejail/
     sudo chmod 644 /etc/firejail/*.profile
     sudo chmod 644 /etc/firejail/common.inc
+    if [ ! -f /etc/firejail/common.inc ]; then
+        echo "Error: common.inc file is missing. Aborting."
+        exit 1
+    fi
     rm -rf /tmp/firejail-profiles
     echo "Firejail profiles have been successfully added."
 }
@@ -94,7 +98,7 @@ function add_whitelist {
             done
         else
             echo "Firejail profile not found at $PROFILE. Creating it."
-            echo -e "include /etc/firejail/disable-common.inc\ninclude /etc/firejail/disable-programs.inc" | sudo tee "$PROFILE" > /dev/null
+            echo -e "include /etc/firejail/common.inc\ninclude /etc/firejail/disable-common.inc\ninclude /etc/firejail/disable-programs.inc" | sudo tee "$PROFILE" > /dev/null
             sudo chmod 644 "$PROFILE"
         fi
     done
