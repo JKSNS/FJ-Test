@@ -20,7 +20,7 @@ function detect_distro {
     fi
 }
 
-# Install Firejail
+# Install Firejail using the distribution package manager
 function install_firejail {
     if command -v firejail &> /dev/null; then
         echo "Firejail is already installed. Skipping installation."
@@ -49,13 +49,8 @@ function install_firejail {
     fi
 }
 
-# Build and install Firejail from source
+# Build and install Firejail from source for the latest features
 function build_firejail {
-    if command -v firejail &> /dev/null; then
-        echo "Firejail is already built and installed from source. Skipping build."
-        return
-    fi
-
     echo "Building Firejail from source..."
     git clone https://github.com/netblue30/firejail.git
     cd firejail
@@ -67,9 +62,10 @@ function build_firejail {
     echo "Firejail successfully built and installed from source."
 }
 
-# Add whitelist to Firejail profiles
+# Add whitelist entries to Firejail profiles
 function add_whitelist {
-    FIREJAIL_PROFILES=("/etc/firejail/server.profile" "/etc/firejail/sshd.profile")
+    # Updated the profile names to match the ones used by the service menu.
+    FIREJAIL_PROFILES=("/etc/firejail/server.profile" "/etc/firejail/ssh.profile")
     WHITELIST_ENTRIES=("whitelist /etc/ssh" "whitelist /etc/ssh/sshd_config")
 
     for PROFILE in "${FIREJAIL_PROFILES[@]}"; do
@@ -79,7 +75,7 @@ function add_whitelist {
             for ENTRY in "${WHITELIST_ENTRIES[@]}"; do
                 if ! grep -q "$ENTRY" "$PROFILE"; then
                     echo "Adding $ENTRY to $PROFILE..."
-                    echo "$ENTRY" | sudo tee -a "$PROFILE"
+                    echo "$ENTRY" | sudo tee -a "$PROFILE" > /dev/null
                 else
                     echo "$ENTRY already exists in $PROFILE."
                 fi
